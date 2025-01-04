@@ -98,7 +98,8 @@ class UserSerializer(serializers.ModelSerializer):
             "is_verified",
             "is_profile_completed",
             "is_active",
-            "user_type"
+            "user_type",
+            "slug"
         ]
 
 

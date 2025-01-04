@@ -22,7 +22,7 @@ class JobSerializer(serializers.ModelSerializer):
 
         model = Job
         fields = "__all__"
-        read_only_fields = ["employer_id", "company"]
+        read_only_fields = ["employer_id", "company", "slug"]
 
     def to_representation(self, instance):
         """
