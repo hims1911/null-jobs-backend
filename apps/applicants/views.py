@@ -29,7 +29,14 @@ class AllApplicantsOfCompany(APIView):
     )
     def get(self, request):
         """List all users that belong to company"""
-        applicants = Applicants.objects.filter(job__employer=request.user)
+        filters = {
+            "job__employer": request.user
+        }
+        slug = request.query_params.get('slug', None)
+        if slug:
+            filters["slug"] = slug
+            
+        applicants = Applicants.objects.filter(**filters)
 
         return Response(
             ApplicantModelSerializer(applicants, many=True).data,
