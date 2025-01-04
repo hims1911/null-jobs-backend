@@ -1,7 +1,8 @@
 import uuid
-from django.utils.text import slugify
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+import string
+import random
 
 # from Jobapp.models import User as JobUser
 # Create your models here.
@@ -38,6 +39,9 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+def generate_unique_slug(length=8):
+    characters = string.ascii_uppercase + string.digits  # Uppercase letters and digits
+    return ''.join(random.choices(characters, k=length))
 
 class User(AbstractBaseUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -73,13 +77,9 @@ class User(AbstractBaseUser):
 
     def save(self, *args, **kwargs):
         if not self.slug:  # Generate slug only if it doesn't exist
-            self.slug = slugify(self.name)
-            # Ensure uniqueness by appending a counter if needed
-            unique_slug = self.slug
-            counter = 1
-            while User.objects.filter(slug=unique_slug).exists():
-                unique_slug = f"{self.slug}{counter}"
-                counter += 1
+            unique_slug = generate_unique_slug()
+            while User.objects.filter(slug=unique_slug).exists():  # Ensure uniqueness
+                unique_slug = generate_unique_slug()
             self.slug = unique_slug
         super().save(*args, **kwargs)
 

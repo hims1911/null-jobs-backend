@@ -4,7 +4,8 @@ from django.db import models
 
 from apps.accounts.models import User
 from apps.jobs.constants import values
-from django.utils.text import slugify
+import string
+import random
 from apps.jobs.constants.values import GENDER, HIRING_STATUS, JOB_TYPE, STATUS_CHOICES
 
 
@@ -52,6 +53,9 @@ class Company(models.Model):
     # policy
     is_deleted = models.BooleanField(default=False, editable=False)
 
+def generate_unique_slug(length=8):
+    characters = string.ascii_uppercase + string.digits  # Uppercase letters and digits
+    return ''.join(random.choices(characters, k=length))
 
 class Job(models.Model):
     """
@@ -105,13 +109,9 @@ class Job(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:  # Generate slug only if it doesn't exist
-            self.slug = slugify(self.title)
-            # Ensure uniqueness by appending a counter if needed
-            unique_slug = self.slug
-            counter = 1
-            while Job.objects.filter(slug=unique_slug).exists():
-                unique_slug = f"{self.slug}{counter}"
-                counter += 1
+            unique_slug = generate_unique_slug()
+            while User.objects.filter(slug=unique_slug).exists():  # Ensure uniqueness
+                unique_slug = generate_unique_slug()
             self.slug = unique_slug
         super().save(*args, **kwargs)
 
