@@ -1,5 +1,5 @@
 import uuid
-
+from django.utils.text import slugify
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
 
@@ -41,6 +41,7 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    slug = models.SlugField(unique=True, blank=True, editable=False)
 
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=200)
@@ -69,6 +70,18 @@ class User(AbstractBaseUser):
 
     USERNAME_FIELD = "email"  # by default required
     REQUIRED_FIELDS = ["name"]
+
+    def save(self, *args, **kwargs):
+        if not self.slug:  # Generate slug only if it doesn't exist
+            self.slug = slugify(self.name)
+            # Ensure uniqueness by appending a counter if needed
+            unique_slug = self.slug
+            counter = 1
+            while User.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{self.slug}{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = "tbl_user_auth"

@@ -4,6 +4,7 @@ from django.db import models
 
 from apps.accounts.models import User
 from apps.jobs.constants import values
+from django.utils.text import slugify
 from apps.jobs.constants.values import GENDER, HIRING_STATUS, JOB_TYPE, STATUS_CHOICES
 
 
@@ -66,6 +67,7 @@ class Job(models.Model):
     job_id = models.UUIDField(
         primary_key=True, default=uuid.uuid4, editable=False, null=False
     )
+    slug = models.SlugField(unique=True, blank=True)
 
     # relations to the user and the company as the jobs are posted by
     # a particular user and the company is more of a employer profile mapping
@@ -100,6 +102,18 @@ class Job(models.Model):
     skills_required = models.TextField(default="No skills details provided")
     education_or_certifications = models.TextField(default="No Education details provided")
     about = models.TextField(default="No description provided")
+
+    def save(self, *args, **kwargs):
+        if not self.slug:  # Generate slug only if it doesn't exist
+            self.slug = slugify(self.title)
+            # Ensure uniqueness by appending a counter if needed
+            unique_slug = self.slug
+            counter = 1
+            while Job.objects.filter(slug=unique_slug).exists():
+                unique_slug = f"{self.slug}{counter}"
+                counter += 1
+            self.slug = unique_slug
+        super().save(*args, **kwargs)
 
 
 class ContactMessage(models.Model):
