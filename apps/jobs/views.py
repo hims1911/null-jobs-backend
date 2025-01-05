@@ -125,7 +125,7 @@ class JobViewSets(viewsets.ModelViewSet):
 
         # check if the user_id present in the request belongs to Employer or Moderator
         if not (
-            UserTypeCheck.is_user_employer(request.user_id)
+            UserTypeCheck.is_user_employer(request.user.id)
             or Moderator().has_permission(request)
         ):
             return response.create_response(
