@@ -46,7 +46,7 @@ class JobViewSets(viewsets.ModelViewSet):
         4. create or update job
     """
 
-    queryset = Job.objects.annotate(total_applicants=Count("applicants")).order_by('-created_at')
+    queryset = Job.objects.filter(is_deleted=False).annotate(total_applicants=Count("applicants")).order_by('-created_at')
     serializer_class = JobSerializer
     filter_backends = [filters.SearchFilter, filters.OrderingFilter, df_filters.DjangoFilterBackend]
     search_fields = ["job_role", "location"]
