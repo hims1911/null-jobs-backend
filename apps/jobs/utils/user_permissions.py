@@ -33,7 +33,7 @@ class UserTypeCheck(permissions.BasePermission):
         """Return bool values based on user_type"""
 
         # Add the user_id to the JWT Later
-        employer_id = request.user_id
+        employer_id = request.user.id
 
         if not employer_id or not validationClass.is_valid_uuid(employer_id):
             return False
