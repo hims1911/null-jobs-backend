@@ -9,6 +9,8 @@ from apps.userprofile.serializers import UserProfileResponseSerializer
 class ApplicantJobSerializer(serializers.Serializer):
     job_id = serializers.UUIDField()
     job_role = serializers.CharField()
+    slug = serializers.SlugField()
+    
 
 
 class ApplicantModelSerializer(serializers.Serializer):
@@ -31,10 +33,6 @@ class UpdateApplicationStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(choices=constants.STATUS_CHOICES, required=True)
 
 
-
-
-
-
 class AppliedJobSerializer(serializers.ModelSerializer):
     job = JobSerializer(read_only=True)
 
@@ -47,7 +45,7 @@ class AppliedJobSerializer(serializers.ModelSerializer):
             'updated_at',
             'is_deleted',
             'is_active',
-            'status'
+            'status',
         ]
 
 
