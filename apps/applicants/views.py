@@ -105,7 +105,7 @@ class GetAppliedJobs(APIView):
     permission_classes = [permissions.IsAuthenticated, IsProfileCompleted]
 
     @extend_schema(
-        responses={200: ApplicantModelSerializer(many=True)},
+        responses={200: AppliedJobSerializer(many=True)},
         tags=["applied_jobs"]
     )
     def get(self, request):
